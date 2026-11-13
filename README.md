@@ -1,6 +1,6 @@
 <div align="center">
   <h1>
-    <img src="https://raw.githubusercontent.com/rapid7/metasploit-framework/master/data/logos/metasploit-logo.svg" alt="Metasploit" width="32" align="absmiddle" />
+    <img height="32" width="32" src="https://simpleicons.org" alt="Metasploit" />
     MSFVenom Payload Studio
   </h1>
   <p>
