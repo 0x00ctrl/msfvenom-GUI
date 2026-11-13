@@ -1,44 +1,56 @@
-# MSFVenom Payload Studio
+<div align="center">
+  <h1>
+    <img src="https://raw.githubusercontent.com/rapid7/metasploit-framework/master/data/logos/metasploit-logo.svg" alt="Metasploit" width="32" align="absmiddle" />
+    MSFVenom Payload Studio
+  </h1>
+  <p>
+    A clean, modern GUI for <code>msfvenom</code>. Pick a platform, narrow down the catalog with a few clicks, and generate your payload—no command-line flag hunting required.
+  </p>
+</div>
 
-A clean, modern GUI for `msfvenom`. Pick a platform, narrow down the
-catalog with a few clicks, and generate your payload, no command-line
-flag hunting required.
+<br />
 
-<img width="1275" height="872" alt="image" src="https://github.com/user-attachments/assets/b3462307-eaed-4439-8693-a88d280716bd" />
-
-<img width="1271" height="873" alt="image" src="https://github.com/user-attachments/assets/38976f4a-1e15-4cd7-8ce9-f6153a1cd467" />
-
+<div align="center">
+  <img width="1275" height="872" alt="MSFVenom Payload Studio Main Interface" src="https://github.com/user-attachments/assets/b3462307-eaed-4439-8693-a88d280716bd" />
+  <br /><br />
+  <img width="1271" height="873" alt="MSFVenom Payload Studio Payload Generation" src="https://github.com/user-attachments/assets/38976f4a-1e15-4cd7-8ce9-f6153a1cd467" />
+</div>
 
 ## Features
 
-- Dark, modern UI built with PySide6
-- Dynamic catalog loaded straight from your installed `msfvenom`
-- Guided flow: platform → architecture → family → transport → payload
-- Searchable payload list with live filtering
-- Payload option inspector
-- Command preview + one-click copy
-- Background workers so the UI never freezes
+- **Dark, modern UI** built with PySide6
+- **Dynamic catalog** loaded directly from your local `msfvenom` installation
+- **Guided filtering workflow:** Platform → Architecture → Family → Transport → Payload
+- **Live search** with instant payload list filtering
+- **Payload option inspector** to view required and optional module parameters
+- **Command preview** with one-click clipboard copy
+- **Asynchronous background workers** to keep the interface responsive during catalog loading and generation
 
-## Setup
+## Installation & Setup
 
-You'll need Python 3, PySide6, and Metasploit installed.
+Ensure you have **Python 3**, **PySide6**, and **Metasploit Framework** installed on your system.
 
+**Arch Linux:**
 ```bash
-sudo pacman -S pyside6 python3 metasploit
+sudo pacman -S python pyside6 metasploit
 ```
-*Installation command for your distro may be different*
+*(Package names and installation commands will vary depending on your distribution.)*
 
+**Run the application:**
 ```bash
 python3 msfvenom-gui.py
 ```
-### Quick start
 
-    Pick a platform from the top card.
-    Optionally narrow it down with architecture, family, or transport. Click All to skip a step.
-    Find your payload in the list. Search works, and you can type a module name directly.
-    Fill in LHOST/LPORT, choose an output format and file, then hit Generate payload.
-    Stuck on a payload's options? Hit Inspect payload options and check the log.
+## Quick Start
 
-### Heads up
-*==The architecture and family buttons are inferred from payload names and are just there to help you navigate. Some unusual modules may show up under unspecified or other / none. Choose All to see everything.
-This tool is for authorized testing only. Don't use it against systems you don't own or have explicit permission to test.==*
+1. **Select a Platform:** Choose your target operating system or environment from the top card.
+2. **Filter the Catalog:** Narrow down results using architecture, family, or transport filters (click **All** to skip any step).
+3. **Choose a Payload:** Select a module from the list, use the search bar to filter, or type a module name directly.
+4. **Configure & Generate:** Set your `LHOST`/`LPORT`, select an output format and destination path, and click **Generate payload**.
+5. **Inspect Options:** If you are unsure about specific module flags, click **Inspect payload options** and review the output log.
+
+## Notes & Disclaimer
+
+> **Catalog Inference:** Architecture and family filters are inferred from payload naming conventions to simplify navigation. Unconventional modules may appear under `unspecified` or `other / none`. Select **All** at any stage to view the unfiltered catalog.
+
+> **Legal Disclaimer:** This tool is intended strictly for authorized security testing and educational purposes. Do not use it against systems you do not own or lack explicit permission to test.
