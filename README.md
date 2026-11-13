@@ -53,4 +53,5 @@ python3 msfvenom-gui.py
 > **Catalog Inference:** Architecture and family filters are inferred from payload naming conventions to simplify navigation. Unconventional modules may appear under `unspecified` or `other / none`. Select **All** at any stage to view the unfiltered catalog.
 
 > **Legal Disclaimer:** This tool is intended strictly for authorized security testing and educational purposes. Do not use it against systems you do not own or lack explicit permission to test.
+
 > *Made this using GPT-6 terra cuz I didnt want to waste time manually writing command each time for building the payloads 😛*
