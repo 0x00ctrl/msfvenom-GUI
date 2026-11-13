@@ -1,6 +1,6 @@
 <div align="center">
   <h1>
-    <img height="32" width="32" src="https://simpleicons.org" alt="Metasploit" />
+    ![Metasploit](https://shields.io)
     MSFVenom Payload Studio
   </h1>
   <p>
