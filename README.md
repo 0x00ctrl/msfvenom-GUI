@@ -1,6 +1,5 @@
 <div align="center">
   <h1>
-    ![Metasploit](https://shields.io)
     MSFVenom Payload Studio
   </h1>
   <p>
