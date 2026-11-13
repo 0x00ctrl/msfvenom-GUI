@@ -29,7 +29,7 @@ sudo pacman -S pyside6 python3 metasploit
 *Installation command for your distro may be different*
 
 ```bash
-python msfvenom-gui.py
+python3 msfvenom-gui.py
 ```
 ### Quick start
 
@@ -40,6 +40,5 @@ python msfvenom-gui.py
     Stuck on a payload's options? Hit Inspect payload options and check the log.
 
 ### Heads up
-The architecture and family buttons are inferred from payload names and are just there to help you navigate. Some unusual modules may show up under unspecified or other / none. Choose All to see everything.
-
-This tool is for authorized testing only. Don't use it against systems you don't own or have explicit permission to test.
+*==The architecture and family buttons are inferred from payload names and are just there to help you navigate. Some unusual modules may show up under unspecified or other / none. Choose All to see everything.
+This tool is for authorized testing only. Don't use it against systems you don't own or have explicit permission to test.==*
