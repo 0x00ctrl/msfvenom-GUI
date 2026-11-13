@@ -54,4 +54,4 @@ python3 msfvenom-gui.py
 
 > **Legal Disclaimer:** This tool is intended strictly for authorized security testing and educational purposes. Do not use it against systems you do not own or lack explicit permission to test.
 
-> *Made this using GPT-6 terra cuz I didnt want to waste time manually writing command each time for building the payloads 😛*
+> *Made this using GPT-6 terra cuz I didnt want to waste time manually writing the command each time for building the payloads 😛*
