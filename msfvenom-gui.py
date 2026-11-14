@@ -10,7 +10,8 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, Qt, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QTextCursor
+from PySide6.QtNetwork import QAbstractSocket, QNetworkInterface
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -22,6 +23,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QListWidget,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPushButton,
     QScrollArea,
@@ -40,48 +42,59 @@ QWidget {
     font-family: "Inter", "Segoe UI", sans-serif;
     font-size: 13px;
 }
+
 QMainWindow, QScrollArea {
     background: #0c1220;
     border: none;
 }
+
 QScrollArea > QWidget > QWidget {
     background: #0c1220;
 }
+
 QFrame#sidebar {
     background: #101a2c;
     border-right: 1px solid #26344b;
 }
+
 QFrame#card {
     background: #141f32;
     border: 1px solid #293850;
     border-radius: 12px;
 }
+
 QFrame#card QLabel {
     background: transparent;
 }
+
 QLabel#title {
     font-size: 23px;
     font-weight: 700;
     color: #f8fafc;
 }
+
 QLabel#brand {
     font-size: 19px;
     font-weight: 700;
     color: #f8fafc;
 }
+
 QLabel#section {
     font-size: 15px;
     font-weight: 700;
     color: #f8fafc;
 }
+
 QLabel#muted {
     color: #a4b3c9;
 }
+
 QLabel#eyebrow {
     color: #8ea2bd;
     font-size: 11px;
     font-weight: 700;
 }
+
 QPushButton {
     background: #223149;
     color: #e9f0fb;
@@ -90,41 +103,50 @@ QPushButton {
     padding: 8px 12px;
     font-weight: 600;
 }
+
 QPushButton:hover {
     background: #2c405d;
     border-color: #587499;
 }
+
 QPushButton:pressed {
     background: #18283e;
 }
+
 QPushButton:disabled {
     color: #8190a5;
     background: #1a2638;
     border-color: #28384e;
 }
+
 QPushButton#primary {
     background: #6d5dfc;
     border-color: #8174ff;
     color: white;
     padding: 10px 16px;
 }
+
 QPushButton#primary:hover {
     background: #8173ff;
 }
+
 QPushButton#primary:disabled {
     background: #343766;
     border-color: #414777;
     color: #aab1c9;
 }
+
 QPushButton#choice {
     text-align: left;
     padding: 9px 12px;
 }
+
 QPushButton#choice:checked {
     background: #343d80;
     border: 1px solid #a29bff;
     color: #ffffff;
 }
+
 QLineEdit, QComboBox, QListWidget, QTextEdit {
     background: #0d1727;
     color: #e7edf7;
@@ -134,49 +156,81 @@ QLineEdit, QComboBox, QListWidget, QTextEdit {
     selection-background-color: #6054cc;
     selection-color: white;
 }
+
 QLineEdit:focus, QComboBox:focus, QListWidget:focus, QTextEdit:focus {
     border: 1px solid #9c91ff;
 }
+
 QLineEdit::placeholder {
     color: #8494aa;
 }
+
 QComboBox::drop-down {
     border: none;
     width: 26px;
 }
+
 QComboBox QAbstractItemView {
     background: #142035;
     color: #e7edf7;
     selection-background-color: #5149ad;
     border: 1px solid #35465f;
 }
+
 QListWidget::item {
     padding: 8px;
     border-radius: 5px;
 }
+
 QListWidget::item:selected {
     background: #5149ad;
     color: white;
 }
+
 QListWidget::item:hover:!selected {
     background: #23334c;
 }
+
+QMenu {
+    background: #142035;
+    color: #e7edf7;
+    border: 1px solid #35465f;
+    padding: 5px;
+}
+
+QMenu::item {
+    padding: 8px 20px;
+    border-radius: 5px;
+}
+
+QMenu::item:selected {
+    background: #5149ad;
+}
+
+QMenu::item:disabled {
+    color: #8190a5;
+}
+
 QScrollBar:vertical {
     background: #101a2c;
     width: 12px;
     margin: 2px;
 }
+
 QScrollBar::handle:vertical {
     background: #526782;
     min-height: 35px;
     border-radius: 4px;
 }
+
 QScrollBar::handle:vertical:hover {
     background: #7189a8;
 }
+
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     height: 0;
 }
+
 QSplitter::handle {
     background: #26344b;
     width: 1px;
@@ -198,10 +252,25 @@ PLATFORM_LABELS = {
 }
 
 ARCH_NAMES = {
-    "x86", "x64", "arm", "armle", "armbe", "aarch64",
-    "mips", "mipsle", "mipsbe", "mips64", "mips64le",
-    "ppc", "ppc64", "sparc", "sparc64", "riscv32",
-    "riscv64", "zarch", "cmd",
+    "x86",
+    "x64",
+    "arm",
+    "armle",
+    "armbe",
+    "aarch64",
+    "mips",
+    "mipsle",
+    "mipsbe",
+    "mips64",
+    "mips64le",
+    "ppc",
+    "ppc64",
+    "sparc",
+    "sparc64",
+    "riscv32",
+    "riscv64",
+    "zarch",
+    "cmd",
 }
 
 FORMAT_SUGGESTIONS = {
@@ -216,10 +285,10 @@ FILTER_KEYS = ("platform", "arch", "family", "transport")
 
 def classify_payload(name):
     """
-    Infer navigation groups from module names.
+    Infer navigation groups from payload names.
 
-    These groups are hints, not authoritative metadata. Every parsed
-    payload remains available in the exact-payload list.
+    These groups are navigation hints, not authoritative metadata.
+    Every parsed payload remains available in the payload list.
     """
     parts = name.split("/")
     platform = parts[0] if parts else "other"
@@ -246,12 +315,16 @@ def classify_payload(name):
 
 def parse_modules(text):
     names = []
+
     for line in text.splitlines():
         parts = line.strip().split()
+
         if parts and "/" in parts[0] and re.fullmatch(
-            r"[A-Za-z0-9_./-]+", parts[0]
+            r"[A-Za-z0-9_./-]+",
+            parts[0],
         ):
             names.append(parts[0])
+
     return sorted(set(names), key=str.lower)
 
 
@@ -283,6 +356,7 @@ def parse_formats(text):
 
         for candidate in candidates:
             candidate = candidate.strip()
+
             if re.fullmatch(r"[A-Za-z0-9_+-]+", candidate):
                 values.append(candidate)
 
@@ -359,8 +433,10 @@ def command_worker(command, timeout):
 
 def make_label(text, name=None):
     label = QLabel(text)
+
     if name:
         label.setObjectName(name)
+
     label.setWordWrap(True)
     return label
 
@@ -368,9 +444,11 @@ def make_label(text, name=None):
 def make_card():
     frame = QFrame()
     frame.setObjectName("card")
+
     layout = QVBoxLayout(frame)
     layout.setContentsMargins(18, 18, 18, 18)
     layout.setSpacing(10)
+
     return frame, layout
 
 
@@ -420,6 +498,7 @@ class MainWindow(QMainWindow):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
 
+        # Sidebar
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
         sidebar.setFixedWidth(240)
@@ -459,6 +538,7 @@ class MainWindow(QMainWindow):
 
         outer.addWidget(sidebar)
 
+        # Main scrollable page
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setHorizontalScrollBarPolicy(
@@ -498,12 +578,13 @@ class MainWindow(QMainWindow):
                 "muted",
             )
         )
+
         self.platform_grid = QGridLayout()
         self.platform_grid.setSpacing(8)
         platform_layout.addLayout(self.platform_grid)
         page.addWidget(platform_card)
 
-        # Navigation card
+        # Filter card
         filters_card, filters_layout = make_card()
         filters_layout.addWidget(
             make_label("02  Narrow your selection", "section")
@@ -516,6 +597,7 @@ class MainWindow(QMainWindow):
         )
 
         self.filter_grids = {}
+
         for key, label in (
             ("arch", "ARCHITECTURE"),
             ("family", "PAYLOAD FAMILY"),
@@ -523,6 +605,7 @@ class MainWindow(QMainWindow):
         ):
             filters_layout.addSpacing(4)
             filters_layout.addWidget(make_label(label, "eyebrow"))
+
             grid = QGridLayout()
             grid.setSpacing(8)
             self.filter_grids[key] = grid
@@ -530,7 +613,7 @@ class MainWindow(QMainWindow):
 
         page.addWidget(filters_card)
 
-        # Payload selection and settings
+        # Payload and configuration cards
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setChildrenCollapsible(False)
 
@@ -576,9 +659,23 @@ class MainWindow(QMainWindow):
             )
         )
 
+        # LHOST with local interface picker
+        config_layout.addWidget(make_label("LHOST", "eyebrow"))
+
+        lhost_row = QHBoxLayout()
+        lhost_row.setSpacing(8)
+
         self.lhost = QLineEdit()
         self.lhost.setPlaceholderText("Host or IP address")
-        self.add_field(config_layout, "LHOST", self.lhost)
+        lhost_row.addWidget(self.lhost, 1)
+
+        self.interface_button = QPushButton("Choose interface")
+        self.interface_button.setToolTip(
+            "Select an IP address from an active local interface"
+        )
+        lhost_row.addWidget(self.interface_button)
+
+        config_layout.addLayout(lhost_row)
 
         self.lport = QLineEdit("4444")
         self.lport.setPlaceholderText("Optional")
@@ -586,17 +683,15 @@ class MainWindow(QMainWindow):
 
         self.format_box = QComboBox()
         self.format_box.setEditable(True)
-        self.format_box.setInsertPolicy(
-            QComboBox.InsertPolicy.NoInsert
+        self.format_box.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self.format_box.lineEdit().setPlaceholderText(
+            "Choose or type a format"
         )
-        self.format_box.lineEdit().setPlaceholderText("Choose or type a format")
         self.add_field(config_layout, "OUTPUT FORMAT", self.format_box)
 
         self.encoder_box = QComboBox()
         self.encoder_box.setEditable(True)
-        self.encoder_box.setInsertPolicy(
-            QComboBox.InsertPolicy.NoInsert
-        )
+        self.encoder_box.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         self.encoder_box.lineEdit().setPlaceholderText("Optional")
         self.add_field(config_layout, "ENCODER", self.encoder_box)
 
@@ -616,9 +711,12 @@ class MainWindow(QMainWindow):
         splitter.setSizes([570, 430])
         page.addWidget(splitter)
 
+        # Actions
         action_row = QHBoxLayout()
+
         self.generate_button = QPushButton("Generate payload")
         self.generate_button.setObjectName("primary")
+
         self.copy_button = QPushButton("Copy command")
         self.clear_button = QPushButton("Clear log")
 
@@ -628,10 +726,10 @@ class MainWindow(QMainWindow):
         action_row.addStretch()
         page.addLayout(action_row)
 
+        # Preview
         preview_card, preview_layout = make_card()
-        preview_layout.addWidget(
-            make_label("Command preview", "section")
-        )
+        preview_layout.addWidget(make_label("Command preview", "section"))
+
         self.preview = QTextEdit()
         self.preview.setReadOnly(True)
         self.preview.setMaximumHeight(90)
@@ -639,8 +737,10 @@ class MainWindow(QMainWindow):
         preview_layout.addWidget(self.preview)
         page.addWidget(preview_card)
 
+        # Log
         log_card, log_layout = make_card()
         log_layout.addWidget(make_label("Activity log", "section"))
+
         self.log = QTextEdit()
         self.log.setReadOnly(True)
         self.log.setMinimumHeight(180)
@@ -660,6 +760,7 @@ class MainWindow(QMainWindow):
             self.browse_executable
         )
         self.refresh_button.clicked.connect(self.load_catalog)
+        self.interface_button.clicked.connect(self.choose_interface)
         self.output_button.clicked.connect(self.browse_output)
         self.inspect_button.clicked.connect(self.inspect_payload)
         self.generate_button.clicked.connect(self.generate)
@@ -667,13 +768,15 @@ class MainWindow(QMainWindow):
         self.clear_button.clicked.connect(self.log.clear)
 
         self.search.textChanged.connect(self.refresh_payload_list)
-        self.payload_list.currentTextChanged.connect(
-            self.payload.setText
-        )
+        self.payload_list.currentTextChanged.connect(self.payload.setText)
 
         for widget in (
-            self.executable, self.payload, self.lhost,
-            self.lport, self.extra, self.output,
+            self.executable,
+            self.payload,
+            self.lhost,
+            self.lport,
+            self.extra,
+            self.output,
         ):
             widget.textChanged.connect(self.update_preview)
 
@@ -699,24 +802,78 @@ class MainWindow(QMainWindow):
     def executable_path(self):
         value = self.executable.text().strip()
         found = shutil.which(value) if value else None
+
         if not found:
             raise ValueError(
                 "msfvenom was not found. Select its path in the sidebar."
             )
+
         return found
 
     def browse_executable(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Select msfvenom"
+            self,
+            "Select msfvenom",
         )
+
         if path:
             self.executable.setText(path)
             self.load_catalog()
 
+    def choose_interface(self):
+        """
+        Show currently active local interfaces and their IPv4/IPv6
+        addresses. The list is rebuilt each time the button is clicked.
+        """
+        menu = QMenu(self)
+        addresses = []
+
+        for interface in QNetworkInterface.allInterfaces():
+            flags = interface.flags()
+
+            if not (flags & QNetworkInterface.InterfaceFlag.IsUp):
+                continue
+
+            for entry in interface.addressEntries():
+                ip = entry.ip()
+                protocol = ip.protocol()
+
+                if protocol not in (
+                    QAbstractSocket.NetworkLayerProtocol.IPv4Protocol,
+                    QAbstractSocket.NetworkLayerProtocol.IPv6Protocol,
+                ):
+                    continue
+
+                address = ip.toString()
+
+                if ip.scopeId() and "%" not in address:
+                    address += f"%{ip.scopeId()}"
+
+                addresses.append((interface.name(), address))
+
+        for name, address in sorted(set(addresses)):
+            action = menu.addAction(f"{name}  —  {address}")
+            action.setData(address)
+
+        if not addresses:
+            action = menu.addAction("No active interface addresses found")
+            action.setEnabled(False)
+
+        selected = menu.exec(
+            self.interface_button.mapToGlobal(
+                self.interface_button.rect().bottomLeft()
+            )
+        )
+
+        if selected and selected.data():
+            self.lhost.setText(selected.data())
+
     def browse_output(self):
         path, _ = QFileDialog.getSaveFileName(
-            self, "Choose output file"
+            self,
+            "Choose output file",
         )
+
         if path:
             self.output.setText(path)
 
@@ -766,6 +923,7 @@ class MainWindow(QMainWindow):
         self.status.setText(
             "Catalog loaded" if not errors else "Catalog incomplete"
         )
+
         self.append_log(
             f"Loaded {len(self.payloads)} payloads, "
             f"{len(self.encoders)} encoders, "
@@ -784,6 +942,7 @@ class MainWindow(QMainWindow):
     @staticmethod
     def set_combo_values(combo, values):
         current = combo.currentText()
+
         combo.blockSignals(True)
         combo.clear()
         combo.addItem("")
@@ -802,6 +961,7 @@ class MainWindow(QMainWindow):
                     break
 
                 selected = self.selection[key]
+
                 if selected not in (None, "*") and record[index] != selected:
                     accepted = False
                     break
@@ -811,15 +971,24 @@ class MainWindow(QMainWindow):
 
         return names
 
-    def render_choice_grid(self, grid, values, selected, callback,
-                           platform=False):
+    def render_choice_grid(
+        self,
+        grid,
+        values,
+        selected,
+        callback,
+        platform=False,
+    ):
         clear_layout(grid)
 
         if not values:
-            grid.addWidget(make_label("Choose a platform first.", "muted"))
+            grid.addWidget(
+                make_label("Choose a platform first.", "muted")
+            )
             return
 
         columns = 4
+
         for index, value in enumerate(values):
             if value == "*":
                 label = "All"
@@ -839,7 +1008,12 @@ class MainWindow(QMainWindow):
             button.clicked.connect(
                 lambda checked=False, current=value: callback(current)
             )
-            grid.addWidget(button, index // columns, index % columns)
+
+            grid.addWidget(
+                button,
+                index // columns,
+                index % columns,
+            )
 
         for column in range(columns):
             grid.setColumnStretch(column, 1)
@@ -873,7 +1047,8 @@ class MainWindow(QMainWindow):
                 values,
                 self.selection[key],
                 lambda value, current=key: self.choose_filter(
-                    current, value
+                    current,
+                    value,
                 ),
             )
 
@@ -895,6 +1070,7 @@ class MainWindow(QMainWindow):
                 item for item in self.formats
                 if item not in suggestions
             ]
+
             self.set_combo_values(self.format_box, values)
             self.format_box.setCurrentText(
                 suggestions[0] if suggestions else ""
@@ -924,11 +1100,14 @@ class MainWindow(QMainWindow):
     def build_command(self):
         command = [
             self.executable.text().strip() or "msfvenom",
-            "-p", self.payload.text().strip(),
-            "-f", self.format_box.currentText().strip(),
+            "-p",
+            self.payload.text().strip(),
+            "-f",
+            self.format_box.currentText().strip(),
         ]
 
         encoder = self.encoder_box.currentText().strip()
+
         if encoder:
             command.extend(["-e", encoder])
 
@@ -937,10 +1116,12 @@ class MainWindow(QMainWindow):
             ("LPORT", self.lport),
         ):
             value = widget.text().strip()
+
             if value:
                 command.append(f"{name}={value}")
 
         extra = self.extra.text().strip()
+
         if extra:
             command.extend(shlex.split(extra))
 
@@ -966,15 +1147,18 @@ class MainWindow(QMainWindow):
         self.status.setText("Command copied")
 
     def append_log(self, text):
-        self.log.moveCursor(self.log.textCursor().MoveOperation.End)
+        self.log.moveCursor(QTextCursor.MoveOperation.End)
         self.log.insertPlainText(text.rstrip() + "\n")
         self.log.ensureCursorVisible()
 
     def inspect_payload(self):
         payload = self.payload.text().strip()
+
         if not payload:
             QMessageBox.warning(
-                self, "Missing payload", "Select a payload first."
+                self,
+                "Missing payload",
+                "Select a payload first.",
             )
             return
 
@@ -990,12 +1174,15 @@ class MainWindow(QMainWindow):
             command_worker,
             ([executable, "-p", payload, "--list-options"], 120),
             self.inspect_finished,
-            lambda error: self.append_log(f"Inspection failed: {error}"),
+            lambda error: self.append_log(
+                f"Inspection failed: {error}"
+            ),
         )
 
     def inspect_finished(self, result):
         code, output = result
         self.append_log(output)
+
         if code:
             self.append_log(f"Inspection exited with code {code}.")
 
@@ -1017,24 +1204,30 @@ class MainWindow(QMainWindow):
         ):
             if not value:
                 QMessageBox.warning(
-                    self, "Missing field", f"{label} is required."
+                    self,
+                    "Missing field",
+                    f"{label} is required.",
                 )
                 return
 
         port = self.lport.text().strip()
+
         if port and (
             not port.isdigit() or not 1 <= int(port) <= 65535
         ):
             QMessageBox.warning(
-                self, "Invalid port",
+                self,
+                "Invalid port",
                 "LPORT must be between 1 and 65535.",
             )
             return
 
         output = Path(self.output.text().strip()).expanduser()
+
         if not output.parent.is_dir():
             QMessageBox.warning(
-                self, "Invalid output",
+                self,
+                "Invalid output",
                 "The output directory does not exist.",
             )
             return
@@ -1048,6 +1241,7 @@ class MainWindow(QMainWindow):
                 | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No,
             )
+
             if answer != QMessageBox.StandardButton.Yes:
                 return
 
@@ -1068,6 +1262,7 @@ class MainWindow(QMainWindow):
 
     def generation_finished(self, result):
         code, output = result
+
         self.generating = False
         self.generate_button.setEnabled(True)
         self.append_log(output)
