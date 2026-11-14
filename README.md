@@ -3,7 +3,7 @@
     MSFVenom Payload Studio
   </h1>
   <p>
-    A clean, modern GUI for <code>msfvenom</code>. Pick a platform, narrow down the catalog with a few clicks, and generate your payload—no command-line flag hunting required.
+    A clean, modern GUI for <code>msfvenom</code>. Pick a platform, narrow down the catalog with a few clicks, and generate your payload, no command-line flag hunting required.
   </p>
 </div>
 
