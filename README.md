@@ -34,7 +34,8 @@ Ensure you have **Python 3**, **PySide6**, and **Metasploit Framework** installe
 sudo pacman -S python3 pyside6 metasploit
 ```
 **Kali/Debian**
-```sudo apt install python3 python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork metasploit-framework
+```bash
+sudo apt install python3 python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork metasploit-framework
 ```
 *(Package names and installation commands will vary depending on your distribution.)*
 
