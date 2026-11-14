@@ -12,7 +12,7 @@
 <div align="center">
   <img width="1275" height="872" alt="MSFVenom Payload Studio Main Interface" src="https://github.com/user-attachments/assets/b3462307-eaed-4439-8693-a88d280716bd" />
   <br /><br />
-  <img width="1271" height="873" alt="MSFVenom Payload Studio Payload Generation" src="https://github.com/user-attachments/assets/38976f4a-1e15-4cd7-8ce9-f6153a1cd467" />
+  <img width="1278" height="875" alt="image" src="https://github.com/user-attachments/assets/44e0e5b7-71f2-473f-b271-0f08ac52b610" />
 </div>
 
 ## Features
