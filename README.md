@@ -31,7 +31,7 @@ Ensure you have **Python 3**, **PySide6**, and **Metasploit Framework** installe
 
 **Arch Linux:**
 ```bash
-sudo pacman -S python pyside6 metasploit
+sudo pacman -S python3 pyside6 metasploit
 ```
 *(Package names and installation commands will vary depending on your distribution.)*
 
